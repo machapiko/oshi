@@ -1,0 +1,228 @@
+import React, { useState } from 'react';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+
+const questions = [
+  {
+    id: 1,
+    text: "自由に使えるお金のうち、推し活に費やす年間金額はどれくらいですか？",
+    options: [
+      { value: 1, text: "1万円未満" },
+      { value: 2, text: "1-5万円" },
+      { value: 3, text: "5-10万円" },
+      { value: 4, text: "10-30万円" },
+      { value: 5, text: "30万円以上" }
+    ]
+  },
+  {
+    id: 2,
+    text: "自由に使える時間のうち、推し活に費やす1日の時間はどれくらいですか？",
+    options: [
+      { value: 1, text: "30分未満" },
+      { value: 2, text: "30分-1時間" },
+      { value: 3, text: "1-2時間" },
+      { value: 4, text: "2-4時間" },
+      { value: 5, text: "4時間以上" }
+    ]
+  },
+  {
+    id: 3,
+    text: "私の生活は最も理想に近い",
+    options: [
+      { value: 1, text: "全くそう思わない" },
+      { value: 2, text: "あまりそう思わない" },
+      { value: 3, text: "どちらともいえない" },
+      { value: 4, text: "ややそう思う" },
+      { value: 5, text: "とてもそう思う" }
+    ]
+  },
+  {
+    id: 4,
+    text: "私の生活の状態は素晴らしい",
+    options: [
+      { value: 1, text: "全くそう思わない" },
+      { value: 2, text: "あまりそう思わない" },
+      { value: 3, text: "どちらともいえない" },
+      { value: 4, text: "ややそう思う" },
+      { value: 5, text: "とてもそう思う" }
+    ]
+  },
+  {
+    id: 5,
+    text: "私は自分の生活に満足している",
+    options: [
+      { value: 1, text: "全くそう思わない" },
+      { value: 2, text: "あまりそう思わない" },
+      { value: 3, text: "どちらともいえない" },
+      { value: 4, text: "ややそう思う" },
+      { value: 5, text: "とてもそう思う" }
+    ]
+  },
+  {
+    id: 6,
+    text: "これまでに人生で大切なものを手に入れた",
+    options: [
+      { value: 1, text: "全くそう思わない" },
+      { value: 2, text: "あまりそう思わない" },
+      { value: 3, text: "どちらともいえない" },
+      { value: 4, text: "ややそう思う" },
+      { value: 5, text: "とてもそう思う" }
+    ]
+  },
+  {
+    id: 7,
+    text: "もし人生をやり直すことができたら、ほとんど何も変えないだろう",
+    options: [
+      { value: 1, text: "全くそう思わない" },
+      { value: 2, text: "あまりそう思わない" },
+      { value: 3, text: "どちらともいえない" },
+      { value: 4, text: "ややそう思う" },
+      { value: 5, text: "とてもそう思う" }
+    ]
+  }
+];
+
+const typeDescriptions = {
+  wandering: {
+    title: "迷走オタク",
+    description: "あなたは推し活に積極的に時間とお金を使っていますが、まだ人生の充実感を模索している段階かもしれません。推し活を楽しみつつ、自分の理想の生活スタイルを見つけていく過渡期にいるタイプです。",
+    svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="40" fill="#FFB6C1"/>
+      <path d="M30 50 Q50 70 70 50" stroke="black" fill="none"/>
+      <circle cx="35" cy="40" r="5" fill="black"/>
+      <circle cx="65" cy="40" r="5" fill="black"/>
+    </svg>`
+  },
+  normal: {
+    title: "ノーマル人間",
+    description: "あなたは推し活にそれほど時間やお金をかけていない、バランス重視のタイプです。趣味の一つとして楽しみながらも、他の生活面とのバランスを保っています。",
+    svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="40" fill="#90EE90"/>
+      <path d="M35 50 Q50 60 65 50" stroke="black" fill="none"/>
+      <circle cx="35" cy="40" r="5" fill="black"/>
+      <circle cx="65" cy="40" r="5" fill="black"/>
+    </svg>`
+  },
+  devoted: {
+    title: "溺愛オタク",
+    description: "推し活に積極的に取り組み、それを通じて高い人生の充実感を得ているタイプです。推し活が自分の生活の重要な部分となっており、それを通じて多くの喜びと満足を見出しています。",
+    svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="40" fill="#87CEEB"/>
+      <path d="M30 50 Q50 80 70 50" stroke="black" fill="none"/>
+      <circle cx="35" cy="40" r="5" fill="black"/>
+      <circle cx="65" cy="40" r="5" fill="black"/>
+      <path d="M40 30 Q50 35 60 30" stroke="red" fill="none"/>
+    </svg>`
+  },
+  light: {
+    title: "ライト層オタク",
+    description: "推し活は控えめですが、生活全般に対する満足度は高いタイプです。趣味として適度に楽しみながら、バランスの取れた充実した生活を送っています。",
+    svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="40" fill="#DDA0DD"/>
+      <path d="M35 50 Q50 65 65 50" stroke="black" fill="none"/>
+      <circle cx="35" cy="40" r="5" fill="black"/>
+      <circle cx="65" cy="40" r="5" fill="black"/>
+    </svg>`
+  },
+  void: {
+    title: "虚無オタク",
+    description: "推し活に時間とお金を費やしていますが、まだ十分な充実感を感じられていないかもしれません。推し活を通じて新しい価値や楽しみを見出すことで、より充実した生活につながる可能性があります。",
+    svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="40" fill="#D3D3D3"/>
+      <path d="M35 60 Q50 50 65 60" stroke="black" fill="none"/>
+      <circle cx="35" cy="40" r="5" fill="black"/>
+      <circle cx="65" cy="40" r="5" fill="black"/>
+    </svg>`
+  }
+};
+
+const DiagnosisTest = () => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [result, setResult] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+
+  const calculateResult = () => {
+    // アクティブ度の計算（質問1-2の平均）
+    const activeScore = (answers[1] + answers[2]) / 2;
+    
+    // 充実度の計算（質問3-7の平均）
+    const satisfactionScore = 
+      (answers[3] + answers[4] + answers[5] + answers[6] + answers[7]) / 5;
+
+    // スコアに基づいてタイプを判定
+    if (activeScore > 3 && satisfactionScore < 3) {
+      return 'wandering';
+    } else if (activeScore < 2.5 && satisfactionScore < 2.5) {
+      return 'normal';
+    } else if (activeScore > 3 && satisfactionScore > 3.5) {
+      return 'devoted';
+    } else if (activeScore < 2.5 && satisfactionScore > 3) {
+      return 'light';
+    } else {
+      return 'void';
+    }
+  };
+
+  const handleAnswer = (value) => {
+    setAnswers({ ...answers, [questions[currentQuestion].id]: value });
+    
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      const resultType = calculateResult();
+      setResult(resultType);
+      setShowResult(true);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-2xl mx-auto p-4">
+      <Card className="mb-4">
+        <CardHeader className="text-center">
+          <h1 className="text-2xl font-bold">推し活タイプ診断テスト</h1>
+        </CardHeader>
+        <CardContent>
+          {!showResult ? (
+            <div>
+              <Progress value={(currentQuestion / questions.length) * 100} className="mb-4" />
+              <div className="mb-4">
+                <h2 className="text-xl mb-4">{questions[currentQuestion].text}</h2>
+                <div className="space-y-2">
+                  {questions[currentQuestion].options.map((option) => (
+                    <Button
+                      key={option.value}
+                      onClick={() => handleAnswer(option.value)}
+                      className="w-full"
+                      variant="outline"
+                    >
+                      {option.text}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <div className="w-48 h-48 mx-auto mb-4" dangerouslySetInnerHTML={{ __html: typeDescriptions[result].svg }} />
+              <h2 className="text-2xl font-bold mb-4">{typeDescriptions[result].title}</h2>
+              <p className="text-lg mb-4">{typeDescriptions[result].description}</p>
+              <Button
+                onClick={() => {
+                  setCurrentQuestion(0);
+                  setAnswers({});
+                  setShowResult(false);
+                }}
+              >
+                もう一度診断する
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default DiagnosisTest;
